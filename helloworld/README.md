@@ -19,10 +19,10 @@ minikube start
 
 1. Go to the Istio release page to download the installation file for your OS, or download and extract the latest release automatically (Linux or macOS):
 
-``
+```
 curl -L https://istio.io/downloadIstio | sh -
 
-``
+```
 
 2. Move to the Istio package directory. For example, if the package is istio-1.9.4:
 ```
