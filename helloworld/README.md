@@ -1,8 +1,8 @@
 # Helloworld service
 
-This is a simple helloworld service that returns simple response like 'hello world!!!' when called.
+This is a simple java spring boot helloworld service that returns simple response like 'hello world!!!' when called.
 
-## Installing minikube
+## Install minikube
 ```
 brew install minikube
 
@@ -34,7 +34,7 @@ cd istio-1.9.4
 export PATH=$PWD/bin:$PATH
 
 ```
-4. Add a namespace label to instruct Istio to automatically inject Envoy sidecar proxies when you deploy your application later:
+4. Create and add a namespace label to instruct Istio to automatically inject Envoy sidecar proxies when you deploy your application later:
 ```
    kubectl create namespace demo-istio
    
@@ -45,8 +45,12 @@ export PATH=$PWD/bin:$PATH
 
 ```
 kubectl apply -f helloworld.yaml --namespace demo-istio
-kubectl apply -f helloworld-gateway.yaml --namespace demo-istio
+It creates service,deployment and pod.
 
+kubectl apply -f helloworld-gateway.yaml --namespace demo-istio
+It creates virtualservice and gateway.
+
+Run the below commands to check the status of pod,service,deploymet,virtualservice and gateway.
 kubectl get gateway --namespace demo-istio
 kubectl get virtualservice --namespace demo-istio
 kubectl get pods --namespace demo-istio
