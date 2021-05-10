@@ -1,4 +1,4 @@
-# Weight based load balancing
+# load balancing with least conn
 
 By default, Istio uses a round-robin load balancing policy, where each service instance in the instance pool gets a request in turn. Istio also supports the following models, which you can specify in destination rules for requests to a particular service or service subset.
 
