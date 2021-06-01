@@ -13,6 +13,7 @@ public class HelloWorldController {
 
 	@GetMapping("/hello")
 	public ResponseEntity<?> hello() {
+		Thread.sleep(5000);
 		try {
 			String host = InetAddress.getLocalHost().getHostName();
 			return new ResponseEntity("Hello World V1 version from "+host, HttpStatus.OK);
