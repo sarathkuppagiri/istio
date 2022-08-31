@@ -64,6 +64,17 @@ kubectl get deployment --namespace demo-istio
 ## Determining the ingress IP and ports
 
 ```
+Execute the following command to determine if your Kubernetes cluster is running in an environment that supports external load balancers:
+
+$ kubectl get svc istio-ingressgateway -n istio-system
+NAME                   TYPE           CLUSTER-IP       EXTERNAL-IP      PORT(S)   AGE
+istio-ingressgateway   LoadBalancer   172.21.109.129   130.211.10.121   ...       17h
+
+If the EXTERNAL-IP value is set, your environment has an external load balancer that you can use for the ingress gateway. If the EXTERNAL-IP value is <none> (or perpetually <pending>), your environment does not provide an external load balancer for the ingress gateway. In this case, you can access the gateway using the service’s node port.
+
+If you are using minikube, you can easily start an external load balancer (recommended) by running the following command in a different terminal:
+
+$ minikube tunnel
 export INGRESS_HOST=$(minikube ip)
 export INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}')
 export GATEWAY_URL=$INGRESS_HOST:$INGRESS_PORT
