@@ -19,6 +19,7 @@ public class HelloWorldController {
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 		
 
