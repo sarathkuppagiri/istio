@@ -33,6 +33,8 @@ cd istio-1.9.4
 ```
 export PATH=$PWD/bin:$PATH
 
+istioctl install --set profile=demo -y
+
 ```
 4. Create and add a namespace label to instruct Istio to automatically inject Envoy sidecar proxies when you deploy your application later:
 ```
