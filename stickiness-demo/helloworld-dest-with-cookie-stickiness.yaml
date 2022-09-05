@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: helloworld
+spec:
+  host: helloworld
+  trafficPolicy:
+    loadBalancer:
+      consistentHash:
+        httpCookie:
+          name: canary
+          ttl: 3600s
+  subsets:
+  - name: all-helloworld-service-pods
+    labels:
+      app: helloworld

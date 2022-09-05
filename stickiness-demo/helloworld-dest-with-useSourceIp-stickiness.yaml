@@ -1,0 +1,14 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: helloworld
+spec:
+  host: helloworld
+  trafficPolicy:
+    loadBalancer:
+      consistentHash:
+        useSourceIp: true # Hash based on the source IP address. This is applicable for both TCP and HTTP connections.
+  subsets:
+  - name: all-helloworld-service-pods
+    labels:
+      app: helloworld

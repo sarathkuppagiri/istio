@@ -1,0 +1,14 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: helloworld
+spec:
+  host: helloworld
+  trafficPolicy:
+    loadBalancer:
+      consistentHash:
+        httpHeaderName: "my-header" # the hash will be calculated based on my-header value that will be passed by curl
+  subsets:
+  - name: all-helloworld-service-pods
+    labels:
+      app: helloworld
