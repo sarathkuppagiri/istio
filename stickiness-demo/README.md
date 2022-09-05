@@ -84,5 +84,7 @@ export GATEWAY_URL=$INGRESS_HOST:$INGRESS_PORT
 
   helloworld-dest-with-queryparamname-stickiness.yaml - Hash based on a specific HTTP query parameter.
   
+  NOTE : ConsistentHashing doesn’t work with weighted routing. Because, we define hashing mechanism under trafficPolicy in DestinationRule Before generating hash the weighted routing already made sure which service to hit. One more thing, the underlying component of Istio, Envoy proxy so far doesn’t support weighted routing with consistent hashing. You can find detail in this github issue.
+  
 ```
 
