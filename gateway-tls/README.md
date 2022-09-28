@@ -1,17 +1,4 @@
-# Jager with spring boot
-
-In the microservice architecture, distributed tracing help us understand better when there is performance issue or when failure happens. Jaeger help us enable the distributed tracing with minimal code changes in our application.
-
-Jaeger without IstioPermalink
-Jaeger works by propogating trace headers in the request. At the start of the flow, a trace and span is created. Then the subsequent services in the flow creates a new span and add them to the trace created at the start. Also it is the responsibility of individual services to push the trace & span information to the jaeger service.
-
-In this article, we will see how to use Jaeger that was bundled with istio from a spring-boot application.
-
-Istio simplifies tracingPermalink
-Istio installation comes pre-bundled with Jaeger
-The istio envoy sidecar takes care of setting the required request headers to enable tracing
-The istio sidecars are designed to send the trace & span information to the Jaeger
-Supports b3 header propogation
+# Ingress Gateway with TLS
 
 ## Install minikube
 ```
