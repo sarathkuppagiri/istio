@@ -57,3 +57,12 @@ $ curl -H "Host:httpbin.org" http://127.0.0.1:80/get
 $ kubectl delete AuthorizationPolicy -n istio-system --all
 
 ```
+## Authorization for HTTP traffic
+
+```
+
+kubectl apply -f hello-message-http-policy.yaml
+curl -H "Host:httpbin.org" http://127.0.0.1:80/get
+
+
+```
