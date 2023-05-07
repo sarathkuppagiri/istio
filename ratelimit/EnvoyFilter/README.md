@@ -116,3 +116,158 @@ curl: (7) Couldn't connect to server
   
 ```
 
+https://learncloudnative.com/blog/2022-09-08-ratelimit-istio
+
+## Rate limiting at the ingress gateway
+
+We can configure the rate limiter at the ingress gateway as well. We can use the same configuration as before, but we need to apply it to the istio-ingressgateway workload instead. Because there's a differentiation between the configuration for sidecars and gateways, we need to use a different context in the EnvoyFilter resource (GATEWAY).
+
+```
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: ingress-ratelimit
+  namespace: istio-system
+spec:
+  workloadSelector:
+    labels:
+      istio: ingressgateway
+  configPatches:
+    - applyTo: HTTP_FILTER
+      match:
+        context: GATEWAY
+        listener:
+          filterChain:
+            filter:
+              name: 'envoy.filters.network.http_connection_manager'
+              subFilter:
+                name: 'envoy.filters.http.router'
+      patch:
+        operation: INSERT_BEFORE
+        value:
+          name: envoy.filters.http.local_ratelimit
+          typed_config:
+            '@type': type.googleapis.com/udpa.type.v1.TypedStruct
+            type_url: type.googleapis.com/envoy.extensions.filters.http.local_ratelimit.v3.LocalRateLimit
+            value:
+              stat_prefix: http_local_rate_limiter
+              token_bucket:
+                max_tokens: 50
+                tokens_per_fill: 10
+                fill_interval: 120s
+              filter_enabled:
+                runtime_key: local_rate_limit_enabled
+                default_value:
+                  numerator: 100
+                  denominator: HUNDRED
+              filter_enforced:
+                runtime_key: local_rate_limit_enforced
+                default_value:
+                  numerator: 100
+                  denominator: HUNDRED
+              response_headers_to_add:
+                - append_action: APPEND_IF_EXISTS_OR_ADD
+                  header:
+                    key: x-rate-limited
+                    value: TOO_MANY_REQUESTS
+              status:
+                code: BadRequest
+
+```
+
+## Rate limiting at the egress gateway
+
+The rate limiter at ingress can protect the mesh from external traffic. However, we can also configure the rate limiter at the egress gateway to protect the external services from the calls inside the mesh. This is useful when we want to limit the number of requests to a specific external service.
+
+```
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: egress-ratelimit
+  namespace: istio-system
+spec:
+  workloadSelector:
+    labels:
+      istio: egressgateway
+  configPatches:
+    - applyTo: HTTP_FILTER
+      match:
+        context: GATEWAY
+        listener:
+          filterChain:
+            filter:
+              name: 'envoy.filters.network.http_connection_manager'
+      patch:
+        operation: INSERT_BEFORE
+        value:
+          name: envoy.filters.http.local_ratelimit
+          typed_config:
+            '@type': type.googleapis.com/udpa.type.v1.TypedStruct
+            type_url: type.googleapis.com/envoy.extensions.filters.http.local_ratelimit.v3.LocalRateLimit
+            value:
+              stat_prefix: http_local_rate_limiter
+    - applyTo: HTTP_ROUTE
+      match:
+        context: GATEWAY
+        routeConfiguration:
+          vhost:
+            name: 'edition.cnn.com:80'
+            route:
+              action: ANY
+      patch:
+        operation: MERGE
+        value:
+          typed_per_filter_config:
+            envoy.filters.http.local_ratelimit:
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
+              type_url: type.googleapis.com/envoy.extensions.filters.http.local_ratelimit.v3.LocalRateLimit
+              value:
+                stat_prefix: http_local_rate_limiter
+                token_bucket:
+                  max_tokens: 50
+                  tokens_per_fill: 10
+                  fill_interval: 120s
+                filter_enabled:
+                  runtime_key: local_rate_limit_enabled
+                  default_value:
+                    numerator: 100
+                    denominator: HUNDRED
+                filter_enforced:
+                  runtime_key: local_rate_limit_enforced
+                  default_value:
+                    numerator: 100
+                    denominator: HUNDRED
+                response_headers_to_add:
+                  - append_action: APPEND_IF_EXISTS_OR_ADD
+                    header:
+                      key: x-rate-limited
+                      value: TOO_MANY_REQUESTS
+                status:
+                  code: BadRequest
+
+
+```
+
+This time resource looks more complex because we're enabling the rate limiter for a specific virtual host. To do that, we still need to insert the rate limiter filter like before. However, we must also add the typed_per_filter_config to the route configuration. This is where we configure the rate limiter for the specific virtual host. Because we need to target a particular virtual host, we'll provide the routeConfigurationin the match section. Inside that, we're targeting a specific virtual host (edition.cnn.com:80) and all routes on that host (action: ANY). Note that we're using the' MERGE' operation because the virtual host and route configuration already exist.
+
+Let's create the EnvoyFilter, go to the curl Pod, and try to send requests to edition.cnn.com:
+
+```
+$ curl -v edition.cnn.com
+> GET / HTTP/1.1
+> User-Agent: curl/7.35.0
+> Host: edition.cnn.com
+> Accept: */*
+>
+< HTTP/1.1 400 Bad Request
+< x-rate-limited: TOO_MANY_REQUESTS
+< content-length: 18
+< content-type: text/plain
+< date: Sun, 04 Sep 2022 23:42:52 GMT
+< server: envoy
+< x-envoy-upstream-service-time: 1
+<
+local_rate_limited
+```
+
+Note that if we sent a request to a different external service, we wouldn't get rate limited as we applied the configuration to only one virtual host.
