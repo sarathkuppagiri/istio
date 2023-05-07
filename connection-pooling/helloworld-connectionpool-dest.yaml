@@ -1,0 +1,27 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: helloworld
+spec:
+  host: helloworld
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 100             # maximum number of TCP conns
+        connectTimeout: 5s              # TCP connection timeout
+        tcpKeepalive:                   # keep alive settings
+          time: 3600s
+          interval: 60s
+      http:
+        maxRequestsPerConnection: 25    # max request per keep-alive
+        http2MaxRequests: 5             # max number of HTTP2 conns
+        http1MaxPendingRequests: 5      # max number of pending reqs
+        maxRetries: 3                   # max number of retries
+        idleTimeout: 60s                # idle timeout for connection
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  - name: v2
+    labels:
+      version: v2
