@@ -1,0 +1,27 @@
+apiVersion: "security.istio.io/v1beta1"
+kind: "RequestAuthentication"
+metadata:
+  name: hello-world-jwt-authz
+  namespace: demo-istio
+spec:
+  selector:
+    matchLabels:
+      app: helloworld
+  jwtRules:
+  - issuer: "packtpub"
+    jwksUri: "https://raw.githubusercontent.com/PacktPublishing/Kubernetes-Service-Mesh-with-Istio/master/Section-5/data/jwks.json"
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: hello-world-require-jwt
+  namespace: demo-istio
+spec:
+  selector:
+    matchLabels:
+      app: helloworld
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+       requestPrincipals: ["packtpub/demo"]
