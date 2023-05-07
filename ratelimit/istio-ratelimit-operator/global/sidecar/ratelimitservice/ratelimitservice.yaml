@@ -1,0 +1,37 @@
+# RateLimitService create external ratelimit service deployment
+# GlobalRateLimitConfig can select this RateLimitService object
+apiVersion: ratelimit.zufardhiyaulhaq.com/v1alpha1
+kind: RateLimitService
+metadata:
+  name: echo-redis-ratelimit-service
+  namespace: default
+spec:
+  kubernetes:
+    replica_count: 2
+    auto_scaling:
+      max_replicas: 3
+      min_replicas: 2
+    resources:
+      limits:
+        cpu: "256m"
+        memory: "256Mi"
+      requests:
+        cpu: "128m"
+        memory: "128Mi"     
+  backend:
+    redis:
+      type: "single"
+      url: "172.30.0.13:6379"
+      ### optional to enabled redis auth
+      # auth: "password"
+      ### optional to enabled redis config
+      # config:
+      #   pipeline_window: "1s"
+      #   pipeline_limit: 10
+  ### optional to enable statsd
+  # monitoring:
+  #   enabled: true
+  # ## Optional to use custom environment variable based on
+  # ## https://github.com/envoyproxy/ratelimit/blob/main/src/settings/settings.go
+  # environment:
+  #   CACHE_KEY_PREFIX: "podinfo"
