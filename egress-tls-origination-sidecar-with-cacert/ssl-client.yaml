@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ssl-client
+  namespace: demo-istio
+  labels:
+    app: my-ssl-client
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8091
+    name: http
+  selector:
+    app: my-ssl-client
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ssl-client
+  namespace: demo-istio
+  labels:
+    app: my-ssl-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-ssl-client
+  template:
+    metadata:
+      labels:
+        app: my-ssl-client
+      annotations:
+       sidecar.istio.io/userVolumeMount: '[{"name":"my-cert", "mountPath":"/etc/my-cert", "readonly":true}]'
+       sidecar.istio.io/userVolume: '[{"name":"my-cert", "secret":{"secretName":"my-cert"}}]'
+    spec:
+      containers:
+      - name: ssl-client
+        image: docker.io/sreddyku/ssl-client:5.0
+        resources:
+          requests:
+            cpu: "100m"
+        imagePullPolicy: IfNotPresent #Always
+        ports:
+        - containerPort: 8091

@@ -1,0 +1,35 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: ssl-server
+  namespace: istio-system
+spec:
+  hosts:
+  - ssl-server.mesh-external.svc.cluster.local
+  ports:
+  - number: 443
+    name: tls
+    protocol: TLS
+  resolution: DNS
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: originate-tls-for-ssl
+  namespace: demo-istio
+spec:
+  host: ssl-server.mesh-external.svc.cluster.local
+  exportTo: ["."]
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+    portLevelSettings:
+    - port:
+        number: 443
+      tls:
+        mode: SIMPLE
+        caCertificates: /etc/my-cert/cert-ssl.crt
+        #credentialName: client-credential
+        # subjectAltNames: # can be enabled if the certificate was generated with SAN as specified in previous section
+        # - my-nginx.mesh-external.svc.cluster.local
