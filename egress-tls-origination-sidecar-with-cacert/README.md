@@ -80,4 +80,28 @@ kubectl port-forward service/ssl-client 8091:8080 -n demo-istio
   curl http://localhost:8091/test/sslclient
   
 ```
+## Apply destination rule to selected pods(app) using subset labels.
+```
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: originate-tls-for-ssl
+  namespace: demo-istio
+spec:
+  host: ssl-server.mesh-external.svc.cluster.local
+  subsets:
+    - name: sample
+      labels:
+        app: my-ssl-client
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+    portLevelSettings:
+    - port:
+        number: 443
+      tls:
+        mode: SIMPLE
+        caCertificates: /etc/my-cert/cert-ssl.crt
+
+```
 
