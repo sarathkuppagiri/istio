@@ -55,7 +55,6 @@ metadata:
 spec:
   hosts:
   - ssl-server.mesh-external.svc.cluster.local
-  - my-nginx.mesh-external.svc.cluster.local
   gateways:
   - istio-egressgateway
   - mesh
@@ -71,12 +70,6 @@ spec:
         port:
           number: 443
       weight: 100
-    - destination:
-        host: istio-egressgateway.demo-istio.svc.cluster.local
-        subset: nginx
-        port:
-          number: 443
-      weight: 100
   - match:
     - gateways:
       - istio-egressgateway
@@ -84,11 +77,6 @@ spec:
     route:
     - destination:
         host: ssl-server.mesh-external.svc.cluster.local
-        port:
-          number: 443
-      weight: 100
-    - destination:
-        host: my-nginx.mesh-external.svc.cluster.local
         port:
           number: 443
       weight: 100
