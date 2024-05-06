@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: ssl-client-vs
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - helloworld-gateway
+  http:
+  - match:
+    - uri:
+        exact: /test/sslclient
+    route:
+    - destination:
+        host: ssl-client
+        port:
+          number: 8080

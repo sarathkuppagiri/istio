@@ -1,39 +1,41 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ssl-client
+  name: ssl-server
+  namespace: mesh-external
   labels:
-    app: my-ssl-client
+    app: my-ssl-server
 spec:
   ports:
-  - port: 8080
-    targetPort: 8091
-    name: http
+  - port: 443
+    targetPort: 7090
+    name: https
   selector:
-    app: my-ssl-client
+    app: my-ssl-server
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ssl-client
+  name: ssl-server
+  namespace: mesh-external
   labels:
-    app: my-ssl-client
+    app: my-ssl-server
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: my-ssl-client
+      app: my-ssl-server
   template:
     metadata:
       labels:
-        app: my-ssl-client
+        app: my-ssl-server
     spec:
       containers:
-      - name: ssl-client
-        image: docker.io/sreddyku/ssl-client:7.0
+      - name: ssl-server
+        image: docker.io/sreddyku/ssl-server:4.0
         resources:
           requests:
             cpu: "100m"
         imagePullPolicy: IfNotPresent #Always
         ports:
-        - containerPort: 8091
+        - containerPort: 7090
