@@ -10,7 +10,7 @@ helm install istio-base base -n istio-system --set defaultRevision=default
 ## Step 2 : Install Istio control plane
 
 ```
-helm install istiod istio-control/istio-discovery  -n istio-system --wait
+helm install istiod istio-control/istio-discovery  -n istio-system --set meshConfig.accessLogFile=/dev/stdout
 
 ```
 
