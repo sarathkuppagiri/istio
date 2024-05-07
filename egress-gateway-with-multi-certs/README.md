@@ -260,3 +260,13 @@ $ rm example.com.crt example.com.key my-nginx.mesh-external.svc.cluster.local.cr
 Delete the generated configuration files used in this example:
 
 $ rm ./nginx.conf
+
+
+```
+kubectl apply -f ssl-client.yaml
+kubectl apply -f egress-gateway.yaml
+kubectl apply -f nginx-vs.yaml
+kubectl create secret generic client-credential-nginx-cacert --from-file=ca.crt=example.com.crt -n demo-istio
+kubectl create secret generic client-credential-cacert --from-file=ca.crt=cert-ssl.crt -n demo-istio
+
+```
