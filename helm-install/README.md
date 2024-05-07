@@ -24,7 +24,7 @@ helm ls -n istio-system
 ## Step 4 : Install Ingress Gateway
 
 ```
-helm install istio-egressgateway gateways/istio-egress -n istio-ingress
+helm install istio-ingressgateway gateways/istio-ingress -n istio-ingress
 
 ```
 
