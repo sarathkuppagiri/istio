@@ -35,4 +35,10 @@ helm install istio-egressgateway gateways/istio-egress -n istio-system --set gat
 
 ```
 
+## supported releases and release downloads
 
+```
+https://istio.io/latest/docs/releases/supported-releases/
+https://github.com/istio/istio/releases
+
+```
