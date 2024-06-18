@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: demo2
-        image: docker.io/sreddyku/demo2:0.0.1-SNAPSHOT
+        image: docker.io/sreddyku/demo2:0.0.2-SNAPSHOT
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

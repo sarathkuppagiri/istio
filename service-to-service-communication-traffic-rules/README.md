@@ -121,6 +121,7 @@ spec:
         host: demo2-svc.demo2.svc.cluster.local
         port:
           number: 80
+    timeout: 1s
 
 
 
