@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: demo-svc-vs
+spec:
+  hosts:
+  - "demo2-svc"
+  http:
+  - match:
+    - uri:
+        exact: /demo2
+    route:
+    - destination:
+        host: demo2-svc.demo2.svc.cluster.local
+        port:
+          number: 80
