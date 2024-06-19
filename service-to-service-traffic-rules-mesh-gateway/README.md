@@ -89,42 +89,12 @@ export GATEWAY_URL=$INGRESS_HOST:$INGRESS_PORT
 ```
   curl http://$GATEWAY_URL/demo1
 
-  output : hello1 from demo1 & hello2 from demo2
-
-  curl http://$GATEWAY_URL/demo2
-
-  output: hello2
+  output : It should return timeout error since i configure timeout as 1s but api takes 3 seconds.
   
 ```
 
-Note : Virtual service which uses gateways only for downstream clients and Virtual service without gateways section for service to service routing rules.
+Note : The names of gateways and sidecars that should apply these routes. Gateways in other namespaces may be referred to by <gateway namespace>/<gateway name>; specifying a gateway with no namespace qualifier is the same as specifying the VirtualService’s namespace. A single VirtualService is used for sidecars inside the mesh as well as for one or more gateways. The selection condition imposed by this field can be overridden using the source field in the match conditions of protocol-specific routes. The reserved word mesh is used to imply all the sidecars in the mesh. When this field is omitted, the default gateway (mesh) will be used, which would apply the rule to all sidecars in the mesh. If a list of gateway names is provided, the rules will apply only to the gateways. To apply the rules to both gateways and sidecars, specify mesh as one of the gateway names.
 
-## Create a virtual service for service to service routing rules
-
-```
-
-kubectl apply -f demo-svc-vs.yaml -n demo2
-
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: demo-svc-vs
-spec:
-  hosts:
-  - "demo2-svc"
-  http:
-  - match:
-    - uri:
-        exact: /demo2
-    route:
-    - destination:
-        host: demo2-svc.demo2.svc.cluster.local
-        port:
-          number: 80
-
-
-
-```
 
 
 
