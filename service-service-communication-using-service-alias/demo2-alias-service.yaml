@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo2-svc-alias
+  namespace: demo2
+spec:
+  type: ExternalName
+  externalName: demo2-svc.demo2.svc.cluster.local
